@@ -552,6 +552,30 @@ eng_sql = function(options) {
   engine_output(options, query, output)
 }
 
+# python engine, using 'reticulate'
+eng_python <- function(options) {
+
+  use_reticulate <-
+    isTRUE(options$reticulate) &&
+    requireNamespace("reticulate", quietly = TRUE)
+
+  if (use_reticulate)
+    eng_reticulate(options)
+  else
+    eng_interpreted(options)
+
+}
+
+eng_reticulate <- function(options) {
+
+  code <- paste(options$code, collapse = "\n")
+  output <- reticulate::py_capture_output(
+    reticulate::py_run_string(code, convert = FALSE)
+  )
+
+  engine_output(options, code, output)
+}
+
 # go engine, added by @hodgesds https://github.com/yihui/knitr/pull/1330
 eng_go = function(options) {
   f = tempfile('code', '.', fileext = ".go")
@@ -590,8 +614,8 @@ eng_go = function(options) {
 local({
   for (i in c(
     'awk', 'bash', 'coffee', 'gawk', 'groovy', 'haskell', 'lein', 'mysql',
-    'node', 'octave', 'perl', 'psql', 'python', 'Rscript', 'ruby', 'sas',
-    'scala', 'sed', 'sh', 'stata', 'zsh'
+    'node', 'octave', 'perl', 'psql', 'Rscript', 'ruby', 'sas', 'scala',
+    'sed', 'sh', 'stata', 'zsh'
   )) knit_engines$set(setNames(list(eng_interpreted), i))
 })
 
@@ -600,7 +624,8 @@ knit_engines$set(
   highlight = eng_highlight, Rcpp = eng_Rcpp, tikz = eng_tikz, dot = eng_dot,
   c = eng_shlib, fortran = eng_shlib, fortran95 = eng_shlib, asy = eng_dot,
   cat = eng_cat, asis = eng_asis, stan = eng_stan, block = eng_block,
-  block2 = eng_block2, js = eng_js, css = eng_css, sql = eng_sql, go = eng_go
+  block2 = eng_block2, js = eng_js, css = eng_css, sql = eng_sql, go = eng_go,
+  python = eng_python
 )
 
 get_engine = function(name) {

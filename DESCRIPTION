@@ -112,7 +112,8 @@ Suggests:
     xml2,
     httr,
     DBI (>= 0.4-1),
-    tibble
+    tibble,
+    reticulate
 License: GPL
 URL: https://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
